@@ -24,7 +24,7 @@ class GameEngine:
         self.font_word = pygame.font.SysFont(None, 52)
         self.font_msg = pygame.font.SysFont(None, 26)
         self.font_btn = pygame.font.SysFont(None, 24)
-
+        self.round_duration = 30000  # ms
         self.next_round()
 
     def scramble_string(self, word):
@@ -39,6 +39,7 @@ class GameEngine:
         self.secret_word = random.choice(self.words)
         self.scrambled_word = self.scramble_string(self.secret_word)
         self.revealed = set()
+        self.round_start = pygame.time.get_ticks()
         self.input_box.clear()
 
     def use_hint(self):
@@ -50,6 +51,10 @@ class GameEngine:
         self.revealed.add(random.choice(hidden))
         self.feedback_msg = "Hint used: -0.25 points this round."
         self.feedback_color = (240, 170, 50)
+
+    def time_left_ms(self):
+        elapsed = pygame.time.get_ticks() - self.round_start
+        return max(0, self.round_duration - elapsed)
 
     def submit_guess(self):
         guess = self.input_box.text.strip().upper()
@@ -83,7 +88,10 @@ class GameEngine:
                 self.input_box.active = True
 
     def update(self):
-        pass
+        if self.time_left_ms() <= 0:
+            self.feedback_msg = f"TIME'S UP! The word was '{self.secret_word}'"
+            self.feedback_color = (240, 80, 80)
+            self.next_round()
 
     def render(self, screen):
         screen.fill((26, 30, 38))
@@ -115,3 +123,17 @@ class GameEngine:
         screen.blit(hint_text, (self.hint_btn.centerx - hint_text.get_width() // 2, self.hint_btn.centery - hint_text.get_height() // 2))
         feedback_surf = self.font_msg.render(self.feedback_msg, True, self.feedback_color)
         screen.blit(feedback_surf, (self.width // 2 - feedback_surf.get_width() // 2, 285))
+        bar_w, bar_h = 300, 14
+        bar_x = self.width // 2 - bar_w // 2
+        bar_y = 320
+        frac = self.time_left_ms() / self.round_duration
+
+        if frac > 0.5:
+            bar_color = (80, 230, 110)    # green
+        elif frac > 0.25:
+            bar_color = (240, 170, 50)    # orange
+        else:
+            bar_color = (240, 80, 80)     # red
+
+        pygame.draw.rect(screen, (50, 55, 65), (bar_x, bar_y, bar_w, bar_h), border_radius=6)
+        pygame.draw.rect(screen, bar_color, (bar_x, bar_y, int(bar_w * frac), bar_h), border_radius=6)
