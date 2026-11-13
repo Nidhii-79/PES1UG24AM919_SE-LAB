@@ -1,6 +1,6 @@
 """
 Lab 6 - Code (line) coverage tests for phone_repair_quote.py
-Name : Puchi | SRN: PES1UG24AM919
+Name: Nidhi S SRN: PES1UG24AM919
 Goal : execute every line of the module at least once.
 """
 import pytest
