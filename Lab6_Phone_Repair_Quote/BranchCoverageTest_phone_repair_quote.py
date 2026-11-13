@@ -1,6 +1,6 @@
 """
 Lab 6 - Branch coverage tests for phone_repair_quote.py
-Name : Puchi | SRN: PES1UG24AM919
+Name : Nidhi S | SRN: PES1UG24AM919
 Goal : make every decision (if / elif / else) evaluate to BOTH True and False,
        including boundary values and each side of compound conditions.
 """
